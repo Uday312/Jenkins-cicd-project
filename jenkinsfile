@@ -1,19 +1,23 @@
 pipeline {
     agent any
+
     environment {
-        IMAGE_NAME = "your-dockerhub-username/jenkins-cicd-demo"
+        IMAGE_NAME = "uday312/jenkins-cicd-demo"
     }
 
     stages {
         stage('Clone Code') {
             steps {
-                git 'https://github.com/your-username/jenkins-cicd-project.git'
+                git 'https://github.com/Uday312/Jenkins-cicd-project.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
+                sh '''
+                    docker build -t $IMAGE_NAME:$BUILD_NUMBER .
+                    docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest
+                '''
             }
         }
 
@@ -23,6 +27,7 @@ pipeline {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push $IMAGE_NAME:$BUILD_NUMBER
+                        docker push $IMAGE_NAME:latest
                     '''
                 }
             }
